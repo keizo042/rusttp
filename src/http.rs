@@ -13,7 +13,7 @@ pub fn send(dist: String, port: u64) -> Option<String>{
         Err(_) => return None,
     };
 
-    let t = format!("{}{}{}{}", "GET / HTTP/1.1\nHost", dist.as_str(), "Connection:close\n" , "\n");
+    let t = format!("{}{}{}{}{}", "GET / HTTP/1.1\nHost", dist.as_str(), "\n", "Connection:close\n" , "\n");
     let _ = stream.write(t.as_bytes());
     let mut v: Vec<u8> = Vec::new();
     let _ = stream.read_to_end(&mut v);
@@ -25,11 +25,12 @@ pub fn send(dist: String, port: u64) -> Option<String>{
 
 #[cfg(test)]
 mod tests {
+    use http;
     #[test]
     fn send_to_google() {
-        let v = match send("google.com",80) {
+        let v = match http::send("google.com".to_string(),80) {
             Some(v) =>v,
-            None => "",
+            None => "".to_string(),
         };
         let text = r#"HTTP/1.1 302 Found
         Cache-Control: private
@@ -45,7 +46,7 @@ mod tests {
         The document has moved
         <A HREF="http://www.google.co.jp/?gfe_rd=cr&amp;ei=hwymV5-HOOOQ8Qel6aMw">here</A>.
         </BODY></HTML>"#;
-        assert_eq!(text,v);
+        assert_eq!(text,v.to_string());
 
     }
 }
