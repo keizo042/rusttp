@@ -8,12 +8,22 @@ struct Conn{
 }
 
 pub fn send(dist: String, port: u64) -> Option<String>{
-    let mut stream = match TcpStream::connect(format!("{}:{}",dist, port).as_str()) {
+    let mut addr = dist.clone();
+    addr.push_str(":");
+    addr.push_str(port.to_string().as_str());
+    let mut stream = match TcpStream::connect(addr.as_str()) {
         Ok(v) =>  v,
-        Err(_) => return None,
+        Err(_) => {return None}
     };
 
-    let t = format!("{}{}{}{}{}", "GET / HTTP/1.1\nHost", dist.as_str(), "\n", "Connection:close\n" , "\n");
+    let mut t = String::new();
+    t.push_str("GET / HTTP/1.1\n");
+    t.push_str("Host:");
+    t.push_str(dist.as_str());
+    t.push_str("\n");
+    t.push_str("Connction:closed\n");
+    t.push_str("\n");
+
     let _ = stream.write(t.as_bytes());
     let mut v: Vec<u8> = Vec::new();
     let _ = stream.read_to_end(&mut v);
